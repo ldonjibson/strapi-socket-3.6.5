@@ -39,21 +39,21 @@
 
 
 module.exports = async () => {
-  process.nextTick(() =>{
-    var io = require('socket.io')(strapi.server);
-    io.on('connection', async function(socket) {
+  // process.nextTick(() =>{
+  //   var io = require('socket.io')(strapi.server);
+  //   io.on('connection', async function(socket) {
 
-      console.log(socket.id, `a user connected`)
-      // send message on user connection
-      socket.emit('hello', JSON.stringify({message: "ffsfs"}));
+  //     console.log(socket.id, `a user connected`)
+  //     // send message on user connection
+  //     socket.emit('hello', JSON.stringify({message: "ffsfs"}));
 
 
-      // listen for user diconnect
-      socket.on('disconnect', () =>{
-        console.log('a user disconnected')
-      });
-    });
-    strapi.io = io; // register socket io inside strapi main object to use it globally anywhere
-  })
+  //     // listen for user diconnect
+  //     socket.on('disconnect', () =>{
+  //       console.log('a user disconnected')
+  //     });
+  //   });
+  //   strapi.io = io; // register socket io inside strapi main object to use it globally anywhere
+  // })
 
 };
