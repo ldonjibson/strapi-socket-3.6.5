@@ -39,6 +39,7 @@
 
 
 module.exports = async () => {
+  console.log(strapi)
   // process.nextTick(() =>{
   //   var io = require('socket.io')(strapi.server);
   //   io.on('connection', async function(socket) {
