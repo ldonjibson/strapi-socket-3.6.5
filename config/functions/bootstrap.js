@@ -52,18 +52,49 @@ module.exports = async () => {
       })
       if (res.length > 0){
         console.log(res[0].username)
-        io.emit("group_join", `${res[0].username} just joined`)
+        io.emit("register", `${res[0].username} just joined`)
       } else {
         res = await strapi.query('user', 'users-permissions').create({
           device_id: data.device_id,
           username: data.username,
           email: data.email
         })
-        io.emit("group_join", `${res.username} just joined`)
+        io.emit("register", `${res.username} just joined`)
       }
     });
     // send message on user connection
     socket.emit('hello', JSON.stringify({message: "ffsfs"}));
+
+    socket.on("create_group", async (data) => {
+      let owner = await strapi.query("user", "users-permissions").findOne({
+        id: data.owner_id
+      })
+      let grop = await strapi.query("rooms").create({
+        name: data.name,
+        type: "group",
+        key: data.key,
+        password: data.password,
+        no_of_participants: data.no_of_participants,
+        users: [owner]
+      })
+      socket.emit("create_group", grop)
+    })
+
+    socket.on("join_group", async (data) => {
+      let member = await strapi.query("user", "users-permissions").findOne({
+        id: data.user_id
+      })
+      let jn_grop = await strapi.query("rooms").findOne({ id: data.room_id })
+      let jnd = jn_grop.users.push(member)
+      console.log(jn_grop, jnd)
+      await strapi.query("rooms").update({ id: data.room_id }, {
+        users: jnd
+      })
+      let user = await strapi.query('user', 'users-permissions').findOne({
+        id: data.user_id
+      })
+      io.emit("room_1", `${user.username} as joined the group`)
+    })
 
     //send messages to a group
     socket.on("send_message", async (data) => {
