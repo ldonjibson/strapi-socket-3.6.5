@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "rooms",
+  "info": {
+    "name": "rooms",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "messages": {
+      "via": "room_id",
+      "collection": "messages"
+    },
+    "key": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    },
+    "no_of_participants": {
+      "type": "integer"
+    },
+    "users": {
+      "via": "rooms",
+      "plugin": "users-permissions",
+      "collection": "user",
+      "dominant": true
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "messages",
+  "info": {
+    "name": "messages",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    },
+    "author": {
+      "via": "messages",
+      "plugin": "users-permissions",
+      "model": "user"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "seen",
+        "not_seen"
+      ]
+    },
+    "type": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "receiver_id": {
+      "via": "receive_messages",
+      "plugin": "users-permissions",
+      "model": "user"
+    },
+    "room_id": {
+      "via": "messages",
+      "model": "rooms"
+    }
+  }
+}

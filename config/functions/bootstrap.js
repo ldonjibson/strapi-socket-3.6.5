@@ -39,22 +39,64 @@
 
 
 module.exports = async () => {
-  console.log(strapi)
   // process.nextTick(() =>{
-    var io = require('socket.io')(strapi.server);
-    io.on('connection', async function(socket) {
+  var io = require('socket.io')(strapi.server);
+  io.on('connection', async function(socket) {
 
-      console.log(socket.id, `a user connected`)
-      // send message on user connection
-      socket.emit('hello', JSON.stringify({message: "ffsfs"}));
-
-
-      // listen for user diconnect
-      socket.on('disconnect', () =>{
-        console.log('a user disconnected')
-      });
+    console.log(socket.id, `a user connected`)
+        // listen for user diconnect
+    socket.on('register', async (data) => {
+      console.log(data, "register this guy");
+      let res = await strapi.query('user', 'users-permissions').find({
+        device_id: data.device_id
+      })
+      if (res.length > 0){
+        console.log(res[0].username)
+        io.emit("group_join", `${res[0].username} just joined`)
+      } else {
+        res = await strapi.query('user', 'users-permissions').create({
+          device_id: data.device_id,
+          username: data.username,
+          email: data.email
+        })
+        io.emit("group_join", `${res.username} just joined`)
+      }
     });
-    strapi.io = io; // register socket io inside strapi main object to use it globally anywhere
-  // })
+    // send message on user connection
+    socket.emit('hello', JSON.stringify({message: "ffsfs"}));
+
+    //send messages to a group
+    socket.on("send_message", async (data) => {
+      let msg = await strapi.query("messages").create({
+        text: data.text,
+        author: data.author,
+        room_id: data.room_id,
+        type: data.type
+      })
+      let room = await strapi.query("rooms").find({id: data.room_id})
+      io.emit(`${room[0].name.toLowerCase()}`, msg)
+    })
+
+    socket.on(`get_messages_group`, async (data) => {
+      let msg = await strapi.query("messages").find({
+        room_id: data.room_id
+      })
+      socket.emit(`messages_${data.room_id}`, msg)
+    })
+
+    //get rooms
+    socket.on(`get_rooms`, async (data) => {
+      let msg = await strapi.query("rooms").find({
+        users_contains: data.user_id
+      })
+      socket.emit(`get_rooms`, msg)
+    })
+
+    // listen for user diconnect
+    socket.on('disconnect', () =>{
+      console.log('a user disconnected')
+    });
+  });
+  strapi.io = io; // register socket io inside strapi main object to use it globally anywhere
 
 };
