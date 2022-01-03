@@ -74,7 +74,7 @@ module.exports = async () => {
         type: data.type
       })
       let room = await strapi.query("rooms").find({id: data.room_id})
-      io.emit(`${room[0].name.toLowerCase()}`, msg)
+      io.emit(`room_${room[0].id}`, msg)
     })
 
     socket.on(`get_messages_group`, async (data) => {
