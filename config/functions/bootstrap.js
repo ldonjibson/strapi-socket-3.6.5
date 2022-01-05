@@ -40,7 +40,15 @@
 
 module.exports = async () => {
   // process.nextTick(() =>{
-  var io = require('socket.io')(strapi.server);
+  var io = require('socket.io')(strapi.server,{
+       cors: {
+         origin: "*",
+         methods: ["GET", "POST"],
+         allowedHeaders: ["my-custom-header"],
+         credentials: true,
+       },
+       transports: ["polling"] 
+    });
   io.on('connection', async function(socket) {
 
     console.log(socket.id, `a user connected`)
